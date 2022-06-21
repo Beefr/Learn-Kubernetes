@@ -30,6 +30,12 @@ Lorsque vous déployez des applications sur Kubernetes, vous indiquez au maître
 
 Un cluster Kubernetes peut être déployé sur des machines physiques ou virtuelles. Pour démarrer avec le développement de Kubernetes, vous pouvez utiliser Minikube. Minikube est une implémentation Kubernetes légère qui crée une machine virtuelle sur votre machine locale et déploie un cluster simple contenant un seul nœud. (Ce que nous ferons.)
 
+Le déploiement instruit Kubernetes de comment créer et mettre à jour des instances de votre application. Une fois que vous avez créé un déploiement, le plannificateur de Kubernetes (kube-scheduler) planifient les instanciations d'application sur des nœuds du cluster. Une fois les instances d’application créées, un contrôleur de déploiement Kubernetes surveille en permanence ces instances. Si le nœud hébergeant une instance tombe en panne ou est supprimé, le contrôleur de déploiement remplace l'instance par une instance située sur un autre nœud du cluster. Ceci fournit un mécanisme d'auto-réparation pour faire face aux pannes ou à la maintenance de la machine. Dans le monde de pré-orchestration, les scripts d'installation étaient souvent utilisés pour démarrer des applications, mais ils ne permettaient pas une récupération après une panne d'ordinateur.
+
+Un pod est un élément de kubernetes représentant un groupe de un ou plusieurs conteneurs(applications) et ressources partagées entre ces conteneurs. Les ressources incluent les volumes, les services et des informations sur comment faire tourner les conteneurs (comme l'image et les ports à utiliser). Un pod représente un élément logique, un ensemble d'éléments étroitements liés les uns aux autres. Les conteneurs dans un pod partagent une adresse ip et un espace de ports. Un pod est l'unité atomique sur kubernetes. Lors de la création d'un déploiement, celui-ci crée des pods contenant des conteneurs à l'intérieur. Chaque pod est lié au noeud qui le manage et y reste jusqu'à sa mort. S'il meurt, un autre pod prend sa place dans un autre noeud disponible. 
+
+Un service est un élément de kubernetes représentant une manière d'accéder aux différents pods. Bien que chaque pod ait une adresse ip unique, ces ip ne sont pas exposées en dehors du cluster sans la présence d'un service. Vous verrez plus tard les différents types de services ainsi que ce que cela implique derrière.
+
 2. Commençons par l'installation, lancez votre vm linux, nous allons avoir besoin d'installer quelques outils. 
 sudo apt-get update
 sudo apt-get upgrade
@@ -150,31 +156,34 @@ NB : sur Minikube en local, aucun système de load balancing n'est en place, vou
 - soit utiliser un fournisseur de cloud qui inclut ce service
 - soit configurer un outil de load balancing en local (il est possible d'utiliser minikube tunnel, qui permet d'accèder à l'hote de Minikube https://minikube.sigs.k8s.io/docs/handbook/accessing/ )
 
-Pour avoir des informations sur les nodes:
+- Pour avoir des informations sur les nodes:
 kubectl get nodes -o wide
 
-Pour avoir des informations sur un élément:
+- Pour avoir des informations sur un élément:
 kubectl describe pod anog-cont
 
-Modifier le nombre de réplicas:
+- Modifier le nombre de réplicas:
 kubectl scale deployment nameofmydeployment --replicas=4
 
-Mettre à jour l'image utilisé pour le déploiement:
+- Mettre à jour l'image utilisé pour le déploiement:
 kubectl set image deployment nameofmydeployment nginx=nginx:1.9.1 --record
 
-Pour annuler (défaire) le déploiement et restaurer la version précédente :
+- Pour annuler (défaire) le déploiement et restaurer la version précédente :
 kubectl rollout undo deployment nameofmydeployment
 
-Supprimer un élément:
+- Supprimer un élément:
 kubectl delete pod/svc/deployment nomdelaressource
 
-Là on peut se connecter sur un pod:
+- Avoir des informations sur le cluster
+kubectl cluster-info
+
+- Se connecter sur un pod:
 kubectl exec -ti mariad-anog -- bash
 Et ça tombe bien, c'est un pod mariadb, donc si on veut on peut se connecter à mariadb:
 mysql -u root -p
 Ah, cela demande un mot de passe... Tranquille, rentrez juste:
 pwd
-Du coup vous pouvez maintenant faire des requêtes SQL, on avait pas dit qu'il fallait mettre en place la base de données? Copiez tout ceci et collez le:
+Du coup vous pouvez maintenant faire des requêtes SQL. On avait pas dit qu'il fallait mettre en place la base de données? Copiez tout ceci et collez le:
 ```
 CREATE DATABASE data;
 use data;
@@ -252,6 +261,6 @@ C'est le 192.168.49.2
 6. Tu peux arrêter Minikube quand tu as fini de jouer: 
 minikube stop
 
-
+Il y a encore énormément de choses à apprendre sur kubernetes, tout ceci ne fait qu'effleurer la surface.
 
 
