@@ -45,13 +45,13 @@ Commençons par l'installation, lancez votre vm linux, nous allons avoir besoin 
 sudo apt-get update
 sudo apt-get upgrade
 ```
-- Kubectl pour l'interface ligne de commande (CLI): 
+### - Kubectl pour l'interface ligne de commande (CLI): 
 ```
 curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
 chmod +x ./kubectl
 sudo mv ./kubectl /usr/local/bin/kubectl
 ```
-- Docker qui est un moteur de conteneur:
+### - Docker qui est un moteur de conteneur:
 ```
 sudo apt install apt-transport-https ca-certificates curl software-properties-common
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
@@ -60,7 +60,7 @@ sudo apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin
 sudo apt autoremove
 sudo usermod -aG docker $USER && newgrp docker
 ```
-- Minikube pour lancer et manipuler les clusters :
+### - Minikube pour lancer et manipuler les clusters :
 ```
 curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64 
 chmod +x minikube
@@ -68,7 +68,7 @@ sudo mkdir -p /usr/local/bin/
 sudo install minikube /usr/local/bin/
 ```
 
-On lance minikube:
+### - On lance minikube:
 ```
 minikube start --driver=docker
 kubectl create namespace monnamespace
@@ -128,12 +128,12 @@ EXPOSE 8080
 
 CMD ["python", "/app/main.py"]
 ```
-Et maintenant build cette image (Il faut se positionner dans le dossier contenant le Dockerfile):
+Et maintenant **build cette image** (Il faut se positionner dans le dossier contenant le Dockerfile):
 ```
 minikube image build -t anog:latest -f ./Dockerfile .
 ```
 
-Et là on lance le pod:
+**Et là on lance le pod:**
 ```
 kubectl apply -f application.yaml
 ```
@@ -159,17 +159,17 @@ Déjà vous pouvez voir avec les commandes précédentes qu'il y a un pvc, cela 
 
 # 4. Voici quelques commandes intéressantes:
 
-Voir les logs d'un des éléments, ici on regarde les logs du pod nginx, et vous voyez que flask tourne à l'intérieur, d'ailleurs vous pourrez voir plus tard chaque requête effectuée sur le pod...
+**Voir les logs** d'un des éléments, ici on regarde les logs du pod nginx, et vous voyez que flask tourne à l'intérieur, d'ailleurs vous pourrez voir plus tard chaque requête effectuée sur le pod...
 ```
 kubectl logs anog-cont
 ```
 
 
-On peut exposer un déploiement:
+On peut **exposer un déploiement:**
 ```
 kubectl expose deployment nameofmydeployment --port 80 --type ClusterIP
 ```
-ClusterIP permet d'exposer des services entre pods du même cluster, mais ne permet pas d'y accéder depuis l'extérieur.
+**ClusterIP** permet d'exposer des services entre pods du même cluster, mais ne permet pas d'y accéder depuis l'extérieur.
 ```
 kubectl get svc
 ```
@@ -178,7 +178,7 @@ Ce qui affiche:
 NAME         TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)   AGE
 nginx        ClusterIP   100.70.204.237   <none>        80/TCP    15m
 ```
-Avec un nodeport il n'y a toujours pas d'adresse ip externe, par contre le port 80 est mappé sur le port 32593, cela signifie que nous pouvons accéder à notre pod via l'ip du node et le port 32593
+Avec un **nodeport** il n'y a toujours pas d'adresse ip externe, par contre le port 80 est mappé sur le port 32593, cela signifie que nous pouvons accéder à notre pod via l'ip du node et le port 32593
 ```
 kubectl expose deployment nameofmydeployment --port 80 --type NodePort
 ```
@@ -188,49 +188,51 @@ nginx        NodePort    100.65.29.172  <none>        80:32593/TCP   8s
 ```
 curl -s ipdunode:32593
 Nous pouvons maintenant accéder au POD, via l'IP du Node, ce qui signifie qu'il est nécessaire de fournir l'adresse IP du Node, hors celle-ci peut changer et donc devoir être modifié.
-Le service de type load balancer va permettre d'obtenir une adresse IP externe pour le cluster et ainsi d'accéder aux applications dans les pods, sans besoin de connaitre l'IP des nodes
+Le service de type **load balancer** va permettre d'obtenir une adresse IP externe pour le cluster et ainsi d'accéder aux applications dans les pods, sans besoin de connaitre l'IP des nodes
+```
 kubectl expose deployment nameofmydeployment --port 80 --type LoadBalancer
+```
 Avec cela, il est possible d'accéder directement à une application via l'IP du cluster.
 NB : sur Minikube en local, aucun système de load balancing n'est en place, vous n'obtiendrez donc pas d'adresse IP externe (publique), si vous voulez en obtenir une il faut :
 - soit utiliser un fournisseur de cloud qui inclut ce service
 - soit configurer un outil de load balancing en local (il est possible d'utiliser minikube tunnel, qui permet d'accèder à l'hote de Minikube https://minikube.sigs.k8s.io/docs/handbook/accessing/ )
 
-- Pour avoir des informations sur les nodes:
+### - Pour avoir des informations sur les nodes:
 ```
 kubectl get nodes -o wide
 ```
 
-- Pour avoir des informations sur un élément:
+### - Pour avoir des informations sur un élément:
 ```
 kubectl describe pod anog-cont
 ```
 
-- Modifier le nombre de réplicas:
+### - Modifier le nombre de réplicas:
 ```
 kubectl scale deployment nameofmydeployment --replicas=4
 ```
 
-- Mettre à jour l'image utilisé pour le déploiement:
+### - Mettre à jour l'image utilisé pour le déploiement:
 ```
 kubectl set image deployment nameofmydeployment nginx=nginx:1.9.1 --record
 ```
 
-- Pour annuler (défaire) le déploiement et restaurer la version précédente :
+### - Pour annuler (défaire) le déploiement et restaurer la version précédente :
 ```
 kubectl rollout undo deployment nameofmydeployment
 ```
 
-- Supprimer un élément:
+### - Supprimer un élément:
 ```
 kubectl delete pod/svc/deployment nomdelaressource
 ```
 
-- Avoir des informations sur le cluster
+### - Avoir des informations sur le cluster
 ```
 kubectl cluster-info
 ```
 
-- Se connecter sur un pod:
+### - Se connecter sur un pod:
 ```
 kubectl exec -ti mariad-anog -- bash
 ```
@@ -297,7 +299,7 @@ Tu vas pouvoir tester que l'application tourne vraiment maintenant!
 Tu as besoin de trouver l'ip et le port et mettre dans le navigateur de la vm: ip:port
 Tu vas arriver sur la page de connexion de l'application, ce qui est drôle c'est que si tu vas sur ip:port/bdd tu verras que ce que tu rentres dans l'application apparaît ensuite dans la base de données
 
-Pour le port:
+### Pour le port:
 ```
 kubectl get svc
 ```
@@ -308,7 +310,7 @@ mariadb-anog-service   ClusterIP   10.104.239.146   <none>        3306/TCP
 ```
 C'est le 30036.
 
-Pour l'ip:
+### Pour l'ip:
 ```
 kubectl get nodes -o wide
 ```
@@ -320,7 +322,7 @@ C'est le 192.168.49.2
 
 
 
-6. Fin du tutoriel:
+# 6. Fin du tutoriel:
 
 Merci d'avoir suivi ce tutoriel.
 Tu peux arrêter Minikube quand tu as fini de jouer: 
