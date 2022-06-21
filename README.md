@@ -1,10 +1,15 @@
 # Learn-Kubernetes
 
+Plan:
+
 1. Explications
 2. Installer Minikube
 3. Lancer une application
 4. Quelques commandes
 5. Jouer avec l'application
+
+________________________________________________
+
 
 1. Kubernetes est un système d'orchestration de cluster. Cela veut dire qu'il permet de déployer des applications conteneurisées sur un cluster. 
 
