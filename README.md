@@ -24,17 +24,25 @@ Tuto officiel de kubernetes: https://kubernetes.io/fr/docs/tutorials/kubernetes-
 
 Kubernetes coordonne un groupe d'ordinateurs hautement disponibles qui sont connectés pour fonctionner comme une seule et même unité. Les abstractions de Kubernetes vous permettent de déployer des applications conteneurisées dans un cluster sans les lier spécifiquement à des ordinateurs individuels. Pour utiliser ce nouveau modèle de déploiement, les applications doivent être empaquetées de manière à les dissocier des hôtes individuels: elles doivent être conteneurisées. Les applications conteneurisées sont plus flexibles et disponibles que dans les modèles de déploiement précédents, dans lesquels les applications étaient installées directement sur des machines spécifiques sous la forme de packages profondément intégrés à l'hôte. Un cluster Kubernetes est constitué de deux types de ressources: le maître qui coordonne le cluster, et les nœuds qui sont les serveurs qui exécutent des applications.
 
+![Schéma du Cluster](https://d33wubrfki0l68.cloudfront.net/283cc20bb49089cb2ca54d51b4ac27720c1a7902/34424/docs/tutorials/kubernetes-basics/public/images/module_01_cluster.svg)
+
 Le maître est responsable de la gestion du cluster. Le maître coordonne toutes les activités de votre cluster, telles que la planification des applications, la gestion de l'état souhaité des applications, la mise à l'échelle des applications et le déploiement de nouvelles mises à jour.
 
 Un nœud est une machine virtuelle ou un ordinateur physique servant d’ordinateur de travail dans un cluster Kubernetes. Chaque nœud est doté d’un Kubelet, qui est un agent permettant de gérer le nœud et de communiquer avec le maître Kubernetes. Le nœud doit également disposer d'outils permettant de gérer les opérations de conteneur, telles que Docker ou rkt. Un cluster Kubernetes qui gère le trafic de production doit comporter au moins trois nœuds.
 
+![Node overview](https://d33wubrfki0l68.cloudfront.net/5cb72d407cbe2755e581b6de757e0d81760d5b86/a9df9/docs/tutorials/kubernetes-basics/public/images/module_03_nodes.svg)
+
 Lorsque vous déployez des applications sur Kubernetes, vous indiquez au maître de démarrer les conteneurs d'applications. Le maître planifie l'exécution des conteneurs sur les nœuds du cluster.
+
+![Déploiement d'une application conteneurisée](https://d33wubrfki0l68.cloudfront.net/8700a7f5f0008913aa6c25a1b26c08461e4947c7/cfc2c/docs/tutorials/kubernetes-basics/public/images/module_02_first_app.svg)
 
 Un cluster Kubernetes peut être déployé sur des machines physiques ou virtuelles. Pour démarrer avec le développement de Kubernetes, vous pouvez utiliser Minikube. Minikube est une implémentation Kubernetes légère qui crée une machine virtuelle sur votre machine locale et déploie un cluster simple contenant un seul nœud. (Ce que nous ferons.)
 
 Le déploiement instruit Kubernetes de comment créer et mettre à jour des instances de votre application. Une fois que vous avez créé un déploiement, le plannificateur de Kubernetes (kube-scheduler) planifient les instanciations d'application sur des nœuds du cluster. Une fois les instances d’application créées, un contrôleur de déploiement Kubernetes surveille en permanence ces instances. Si le nœud hébergeant une instance tombe en panne ou est supprimé, le contrôleur de déploiement remplace l'instance par une instance située sur un autre nœud du cluster. Ceci fournit un mécanisme d'auto-réparation pour faire face aux pannes ou à la maintenance de la machine. Dans le monde de pré-orchestration, les scripts d'installation étaient souvent utilisés pour démarrer des applications, mais ils ne permettaient pas une récupération après une panne d'ordinateur.
 
 Un pod est un élément de kubernetes représentant un groupe de un ou plusieurs conteneurs(applications) et ressources partagées entre ces conteneurs. Les ressources incluent les volumes, les services et des informations sur comment faire tourner les conteneurs (comme l'image et les ports à utiliser). Un pod représente un élément logique, un ensemble d'éléments étroitements liés les uns aux autres. Les conteneurs dans un pod partagent une adresse ip et un espace de ports. Un pod est l'unité atomique sur kubernetes. Lors de la création d'un déploiement, celui-ci crée des pods contenant des conteneurs à l'intérieur. Chaque pod est lié au noeud qui le manage et y reste jusqu'à sa mort. S'il meurt, un autre pod prend sa place dans un autre noeud disponible. 
+
+![Pods overview](https://d33wubrfki0l68.cloudfront.net/fe03f68d8ede9815184852ca2a4fd30325e5d15a/98064/docs/tutorials/kubernetes-basics/public/images/module_03_pods.svg)
 
 Un service est un élément de kubernetes représentant une manière d'accéder aux différents pods. Bien que chaque pod ait une adresse ip unique, ces ip ne sont pas exposées en dehors du cluster sans la présence d'un service. Vous verrez plus tard les différents types de services ainsi que ce que cela implique derrière.
 
