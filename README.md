@@ -11,7 +11,9 @@ Plan:
 ________________________________________________
 
 
-1. Kubernetes est un système d'orchestration de cluster. Cela veut dire qu'il permet de déployer des applications conteneurisées sur un cluster. 
+# 1. Explications 
+
+Kubernetes est un système d'orchestration de cluster. Cela veut dire qu'il permet de déployer des applications conteneurisées sur un cluster. 
 
 Le besoin initial: 
 - avoir des applications disponibles 24h/24, 7j/7
@@ -36,7 +38,9 @@ Un pod est un élément de kubernetes représentant un groupe de un ou plusieurs
 
 Un service est un élément de kubernetes représentant une manière d'accéder aux différents pods. Bien que chaque pod ait une adresse ip unique, ces ip ne sont pas exposées en dehors du cluster sans la présence d'un service. Vous verrez plus tard les différents types de services ainsi que ce que cela implique derrière.
 
-2. Commençons par l'installation, lancez votre vm linux, nous allons avoir besoin d'installer quelques outils. 
+# 2. Installer Minikube
+
+Commençons par l'installation, lancez votre vm linux, nous allons avoir besoin d'installer quelques outils. 
 ```
 sudo apt-get update
 sudo apt-get upgrade
@@ -83,7 +87,9 @@ apiserver: Running
 kubeconfig: Configured
 ```
 
-3. A ce stade vous êtes prêt à déployer une application.
+# 3. Lancer une application
+
+A ce stade vous êtes prêt à déployer une application.
 
 Actuellement rien ne tourne, vous pouvez vérifier avec:
 ```
@@ -151,7 +157,7 @@ kubectl get pvc
 Dans ce tuto on ne va pas regarder comment faire les fichiers de configuration (les yaml), mais cela peut être intéressant d'aller y jeter un petit coup d'oeil. https://github.com/Beefr/kubernetes-training/blob/master/exercice-3-k8s-manifest.md
 Déjà vous pouvez voir avec les commandes précédentes qu'il y a un pvc, cela sert d'emplacement de stockage pour les données de l'application, car l'un des conteneurs est un système de gestion de base de données et donc il faut pouvoir stocker les informations quelque part. D'ailleurs il faudra mettre en place la base de données aussi, on verra cela plus tard, cela permettra de voir une commande interessante de Kubernetes. L'autre pod c'est l'application, elle contient nginx, flask et le code python. Svc c'est pour service, c'est ce qui sert à connecter tous les éléments entre eux.
 
-4. Voici quelques commandes intéressantes:
+# 4. Voici quelques commandes intéressantes:
 
 Voir les logs d'un des éléments, ici on regarde les logs du pod nginx, et vous voyez que flask tourne à l'intérieur, d'ailleurs vous pourrez voir plus tard chaque requête effectuée sur le pod...
 ```
@@ -285,7 +291,9 @@ INSERT INTO world VALUES('Etoile', 12);
 ```
 
 
-5. Tu vas pouvoir tester que l'application tourne vraiment maintenant!
+# 5. Tester l'application
+
+Tu vas pouvoir tester que l'application tourne vraiment maintenant!
 Tu as besoin de trouver l'ip et le port et mettre dans le navigateur de la vm: ip:port
 Tu vas arriver sur la page de connexion de l'application, ce qui est drôle c'est que si tu vas sur ip:port/bdd tu verras que ce que tu rentres dans l'application apparaît ensuite dans la base de données
 
@@ -312,7 +320,10 @@ C'est le 192.168.49.2
 
 
 
-6. Tu peux arrêter Minikube quand tu as fini de jouer: 
+6. Fin du tutoriel:
+
+Merci d'avoir suivi ce tutoriel.
+Tu peux arrêter Minikube quand tu as fini de jouer: 
 ```
 minikube stop
 ```
