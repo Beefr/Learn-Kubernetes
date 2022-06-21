@@ -37,54 +37,71 @@ Un pod est un élément de kubernetes représentant un groupe de un ou plusieurs
 Un service est un élément de kubernetes représentant une manière d'accéder aux différents pods. Bien que chaque pod ait une adresse ip unique, ces ip ne sont pas exposées en dehors du cluster sans la présence d'un service. Vous verrez plus tard les différents types de services ainsi que ce que cela implique derrière.
 
 2. Commençons par l'installation, lancez votre vm linux, nous allons avoir besoin d'installer quelques outils. 
+```
 sudo apt-get update
 sudo apt-get upgrade
+```
 - Kubectl pour l'interface ligne de commande (CLI): 
+```
 curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
 chmod +x ./kubectl
 sudo mv ./kubectl /usr/local/bin/kubectl
+```
 - Docker qui est un moteur de conteneur:
+```
 sudo apt install apt-transport-https ca-certificates curl software-properties-common
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu `lsb_release -cs` test"
 sudo apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin
 sudo apt autoremove
 sudo usermod -aG docker $USER && newgrp docker
+```
 - Minikube pour lancer et manipuler les clusters :
+```
 curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64 
 chmod +x minikube
 sudo mkdir -p /usr/local/bin/
 sudo install minikube /usr/local/bin/
-
+```
 
 On lance minikube:
+```
 minikube start --driver=docker
 kubectl create namespace monnamespace
 kubectl config set-context $(kubectl config current-context) --namespace=monnamespace
+```
 
-
-Faîtes: minikube status
+Faîtes: 
+```
+minikube status
+```
 Cela renvoie:
+```
 host: Running
 kubelet: Running
 apiserver: Running
 kubeconfig: Configured
+```
 
 3. A ce stade vous êtes prêt à déployer une application.
 
 Actuellement rien ne tourne, vous pouvez vérifier avec:
+```
 kubectl get pods
 kubectl get deploy
 kubectl get svc
 kubectl get pv
 kubectl get pvc
+```
 
 Créons une image de python contenant nginx, flask et du code python pour pouvoir ensuite la lancer:
 (nginx est un serveur web et un reverse proxy)
 (Flask est un micro framework open-source de développement web en Python.)
+```
 git clone https://github.com/xXHayabusaXx/miniGame.git
 cd app/
 git clone https://github.com/Beefr/OnePiece.git
+```
 Il va falloir modifier légèrement le Dockerfile, remplace le tout par ceci:
 ```
 FROM python:latest
@@ -106,22 +123,30 @@ EXPOSE 8080
 CMD ["python", "/app/main.py"]
 ```
 Et maintenant build cette image (Il faut se positionner dans le dossier contenant le Dockerfile):
+```
 minikube image build -t anog:latest -f ./Dockerfile .
+```
 
 Et là on lance le pod:
+```
 kubectl apply -f application.yaml
+```
 
 Il faut lancer quelques autres éléments aussi:
+```
 kubectl apply -f persistent-volume.yaml
 kubectl apply -f service.yaml
 kubectl apply -f database.yaml
+```
 
 Refaîtes:
+```
 kubectl get pods
 kubectl get deploy
 kubectl get svc
 kubectl get pv
 kubectl get pvc
+```
 
 Dans ce tuto on ne va pas regarder comment faire les fichiers de configuration (les yaml), mais cela peut être intéressant d'aller y jeter un petit coup d'oeil. https://github.com/Beefr/kubernetes-training/blob/master/exercice-3-k8s-manifest.md
 Déjà vous pouvez voir avec les commandes précédentes qu'il y a un pvc, cela sert d'emplacement de stockage pour les données de l'application, car l'un des conteneurs est un système de gestion de base de données et donc il faut pouvoir stocker les informations quelque part. D'ailleurs il faudra mettre en place la base de données aussi, on verra cela plus tard, cela permettra de voir une commande interessante de Kubernetes. L'autre pod c'est l'application, elle contient nginx, flask et le code python. Svc c'est pour service, c'est ce qui sert à connecter tous les éléments entre eux.
@@ -129,20 +154,28 @@ Déjà vous pouvez voir avec les commandes précédentes qu'il y a un pvc, cela 
 4. Voici quelques commandes intéressantes:
 
 Voir les logs d'un des éléments, ici on regarde les logs du pod nginx, et vous voyez que flask tourne à l'intérieur, d'ailleurs vous pourrez voir plus tard chaque requête effectuée sur le pod...
+```
 kubectl logs anog-cont
+```
 
 
 On peut exposer un déploiement:
+```
 kubectl expose deployment nameofmydeployment --port 80 --type ClusterIP
+```
 ClusterIP permet d'exposer des services entre pods du même cluster, mais ne permet pas d'y accéder depuis l'extérieur.
+```
 kubectl get svc
+```
 Ce qui affiche:
 ```
 NAME         TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)   AGE
 nginx        ClusterIP   100.70.204.237   <none>        80/TCP    15m
 ```
 Avec un nodeport il n'y a toujours pas d'adresse ip externe, par contre le port 80 est mappé sur le port 32593, cela signifie que nous pouvons accéder à notre pod via l'ip du node et le port 32593
+```
 kubectl expose deployment nameofmydeployment --port 80 --type NodePort
+```
 ```
 NAME         TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)        AGE
 nginx        NodePort    100.65.29.172  <none>        80:32593/TCP   8s
@@ -157,32 +190,49 @@ NB : sur Minikube en local, aucun système de load balancing n'est en place, vou
 - soit configurer un outil de load balancing en local (il est possible d'utiliser minikube tunnel, qui permet d'accèder à l'hote de Minikube https://minikube.sigs.k8s.io/docs/handbook/accessing/ )
 
 - Pour avoir des informations sur les nodes:
+```
 kubectl get nodes -o wide
+```
 
 - Pour avoir des informations sur un élément:
+```
 kubectl describe pod anog-cont
+```
 
 - Modifier le nombre de réplicas:
+```
 kubectl scale deployment nameofmydeployment --replicas=4
+```
 
 - Mettre à jour l'image utilisé pour le déploiement:
+```
 kubectl set image deployment nameofmydeployment nginx=nginx:1.9.1 --record
+```
 
 - Pour annuler (défaire) le déploiement et restaurer la version précédente :
+```
 kubectl rollout undo deployment nameofmydeployment
+```
 
 - Supprimer un élément:
+```
 kubectl delete pod/svc/deployment nomdelaressource
+```
 
 - Avoir des informations sur le cluster
+```
 kubectl cluster-info
+```
 
 - Se connecter sur un pod:
+```
 kubectl exec -ti mariad-anog -- bash
+```
 Et ça tombe bien, c'est un pod mariadb, donc si on veut on peut se connecter à mariadb:
+```
 mysql -u root -p
-Ah, cela demande un mot de passe... Tranquille, rentrez juste:
-pwd
+```
+Ah, cela demande un mot de passe... Tranquille, rentrez juste: "pwd".
 Du coup vous pouvez maintenant faire des requêtes SQL. On avait pas dit qu'il fallait mettre en place la base de données? Copiez tout ceci et collez le:
 ```
 CREATE DATABASE data;
@@ -240,7 +290,9 @@ Tu as besoin de trouver l'ip et le port et mettre dans le navigateur de la vm: i
 Tu vas arriver sur la page de connexion de l'application, ce qui est drôle c'est que si tu vas sur ip:port/bdd tu verras que ce que tu rentres dans l'application apparaît ensuite dans la base de données
 
 Pour le port:
+```
 kubectl get svc
+```
 ```
 NAME                   TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)                         AGE
 anog                   NodePort    10.106.206.133   <none>        8080:30036/TCP,3306:30944/TCP   6d4h
@@ -249,7 +301,9 @@ mariadb-anog-service   ClusterIP   10.104.239.146   <none>        3306/TCP
 C'est le 30036.
 
 Pour l'ip:
+```
 kubectl get nodes -o wide
+```
 ```
 NAME       STATUS   ROLES                  AGE   VERSION   INTERNAL-IP    EXTERNAL-IP   OS-IMAGE             KERNEL-VERSION      CONTAINER-RUNTIME
 minikube   Ready    control-plane,master   11d   v1.23.3   192.168.49.2   <none>        Ubuntu 20.04.2 LTS   5.13.0-1031-azure   docker://20.10.12
@@ -259,7 +313,9 @@ C'est le 192.168.49.2
 
 
 6. Tu peux arrêter Minikube quand tu as fini de jouer: 
+```
 minikube stop
+```
 
 Il y a encore énormément de choses à apprendre sur kubernetes, tout ceci ne fait qu'effleurer la surface.
 
