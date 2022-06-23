@@ -6,7 +6,8 @@ Plan:
 2. Installer Minikube
 3. Lancer une application
 4. Quelques commandes
-5. Jouer avec l'application
+5. Créer une pipeline avec Jenkins
+6. Jouer avec l'application
 
 ________________________________________________
 
@@ -113,8 +114,6 @@ Créons une image de python contenant nginx, flask et du code python pour pouvoi
 (Flask est un micro framework open-source de développement web en Python.)
 ```
 git clone https://github.com/xXHayabusaXx/miniGame.git
-cd app/
-git clone -b tutorial https://github.com/Beefr/OnePiece.git
 ```
 Il va falloir modifier légèrement le Dockerfile, remplace le tout par ceci:
 ```
@@ -151,6 +150,7 @@ Il faut lancer quelques autres éléments aussi:
 kubectl apply -f persistent-volume.yaml
 kubectl apply -f service.yaml
 kubectl apply -f database.yaml
+kubectl apply -f jenkins.yaml
 ```
 
 Refaîtes:
@@ -299,9 +299,70 @@ INSERT INTO world VALUES('Etoile', 12);
 
 
 ```
+# 5. Créer une pipeline avec Jenkins
 
+Jenkins permet d'automatiser un certain nombre de choses, notamment les builds, au travers de pipelines. Ici on ne va pas le faire build car j'ai préféré créer une image contenant tout ce qu'il faut sauf le code, donc pas besoin de refaire d'autres images. En revanche il manque le code, et c'est là que Jenkins intervient dans notre cas. On va le configurer pour qu'il clone le code python dans le volume auquel il est connecté, et cela permettra à notre conteneur nginx d'y accéder. L'intérêt c'est que si on modifie le code il suffit de relancer la pipeline, qui retélécharge le code et pas besoin de recréer une image! 
+L'intérêt aussi c'est que si on a potentiellement plusieurs applications python qui fonctionnent (plus ou moins) de la même manière alors on a besoin que d'une seule image et seulement d'adapter le backend. 
 
-# 5. Tester l'application
+Passons à la configuration:
+On doit d'abord se connecter à Jenkins.
+### Pour le port:
+```
+kubectl get svc
+```
+```
+NAME                   TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)                         AGE
+jenkins-service        NodePort    10.110.175.157   <none>        8080:30037/TCP,50000:32754/TCP   26h
+```
+C'est le 30037.
+### Pour l'ip:
+```
+kubectl get nodes -o wide
+```
+```
+NAME       STATUS   ROLES                  AGE   VERSION   INTERNAL-IP    EXTERNAL-IP   OS-IMAGE             KERNEL-VERSION      CONTAINER-RUNTIME
+minikube   Ready    control-plane,master   11d   v1.23.3   192.168.49.2   <none>        Ubuntu 20.04.2 LTS   5.13.0-1031-azure   docker://20.10.12
+```
+L'ip est 192.168.49.2.
+Donc dans votre navigateur, vous rentrez 192.168.49.2:30037, et cela vous affiche la page d'accueil de Jenkins (après un chargement d'1 ou 2min).
+Et là ça vous demande un mot de passe, pas de panique, il suffit de rentrer dans le conteneur nginx comme indiqué sur la page:
+```
+kubectl exec -ti jenkins-cont -- bash
+cat var/jenkins_home/secrets/ini.....
+```
+Cela renvoie une chaîne de caractères que vous rentrez.
+Ensuite il faut configurer votre compte admin de Jenkins, vous mettez "admin" partout. Mettez bien "admin" sinon faudra adapter certaines choses...
+Vous le faîtes télécharger les plugins recommandés avec le bouton de gauche.
+Une fois rentré sur le dashboard vous créez un nouveau job, vous l'appelez "python-pipeline", vous sélectionnez "pipeline", puis "OK".
+Dans "Build Triggers", il faut cocher "Trigger builds remotely", vous écrivez "copyCode".
+Et dans script, vous mettez:
+```
+pipeline {
+    agent any
+    stages {
+        stage('Build') {
+            steps {
+                // Get some code from a GitHub repository
+                git url: 'https://github.com/Beefr/OnePiece.git', branch: 'dev'
+
+            }
+        }
+    }
+}
+```
+Plus qu'à sauvegarder.
+
+Donc on récapitule, on a une image avec nginx et flask mais c'est une coquille vide, il n'y a pas le code dedans, donc il faut lancer la pipeline pour faire fonctionner l'application. 
+```
+curl -I http://admin:admin@192.168.49.2:30037/job/python-pipeline/build?token=copyCode
+kubectl delete pod anog-cont
+```
+Regardez dans Jenkins, vous pouvez voir qu'il y a eu un "build", c'est juste un git clone du code python. Il a mit ce code dans son système de fichiers et comme on y a connecté un volume, volume qui est connecté à nginx, lorsque nous relancerons le pod, le conteneur nginx aura accès au code. Dès que le git clone est fini, relancez le pod:
+```
+kubectl apply -f application.yaml
+``` 
+
+# 6. Tester l'application
 
 Tu vas pouvoir tester que l'application tourne vraiment maintenant!
 Tu as besoin de trouver l'ip et le port et mettre dans le navigateur de la vm: ip:port
