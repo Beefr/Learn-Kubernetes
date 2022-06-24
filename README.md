@@ -254,8 +254,8 @@ Du coup vous pouvez maintenant faire des requêtes SQL. On avait pas dit qu'il f
 CREATE DATABASE data;
 use data;
 
-CREATE TABLE joueur(username varchar(20) PRIMARY KEY NOT NULL, password varchar(20));
-CREATE TABLE equipage(username varchar(20) PRIMARY KEY NOT NULL, position varchar(20), piratesid varchar(20));
+CREATE TABLE joueur(username varchar(20) PRIMARY KEY NOT NULL, password varchar(250));
+CREATE TABLE equipage(username varchar(20) PRIMARY KEY NOT NULL, position varchar(20), piratesid varchar(250));
 CREATE TABLE fruit(name varchar(20)  PRIMARY KEY NOT NULL, power varchar(20), allocated INT);
 CREATE TABLE pirate(id INT PRIMARY KEY NOT NULL, name varchar(40), level INT, fruit varchar(20), qualite INT);
 CREATE TABLE world(name varchar(20) PRIMARY KEY NOT NULL, stage INT);
