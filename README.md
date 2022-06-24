@@ -163,7 +163,7 @@ kubectl get pvc
 ```
 
 Dans ce tuto on ne va pas regarder comment faire les fichiers de configuration (les yaml), mais cela peut être intéressant d'aller y jeter un petit coup d'oeil. https://github.com/Beefr/kubernetes-training/blob/master/exercice-3-k8s-manifest.md
-Déjà vous pouvez voir avec les commandes précédentes qu'il y a un pvc, cela sert d'emplacement de stockage pour les données de l'application, car l'un des conteneurs est un système de gestion de base de données et donc il faut pouvoir stocker les informations quelque part. D'ailleurs il faudra mettre en place la base de données aussi, on verra cela plus tard, cela permettra de voir une commande interessante de Kubernetes. L'autre pod c'est l'application, elle contient nginx, flask et le code python. Svc c'est pour service, c'est ce qui sert à connecter tous les éléments entre eux.
+Déjà vous pouvez voir avec les commandes précédentes qu'il y a un pvc, cela sert d'emplacement de stockage pour les données de l'application, car l'un des conteneurs est un système de gestion de bases de données et donc il faut pouvoir stocker les informations quelque part. D'ailleurs il faudra mettre en place la base de données aussi, on verra cela plus tard, cela permettra de voir une commande interessante de Kubernetes. L'autre pod c'est l'application, elle contient nginx, flask et le code python. Svc c'est pour service, c'est ce qui sert à connecter tous les éléments entre eux.
 
 # 4. Voici quelques commandes intéressantes:
 
@@ -195,7 +195,7 @@ NAME         TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)        AGE
 nginx        NodePort    100.65.29.172  <none>        80:32593/TCP   8s
 ```
 curl -s ipdunode:32593
-Nous pouvons maintenant accéder au POD, via l'IP du Node, ce qui signifie qu'il est nécessaire de fournir l'adresse IP du Node, hors celle-ci peut changer et donc devoir être modifié.
+Nous pouvons maintenant accéder au POD, via l'IP du Node, ce qui signifie qu'il est nécessaire de fournir l'adresse IP du Node, hors celle-ci peut changer et donc devoir être modifiée.
 Le service de type **load balancer** va permettre d'obtenir une adresse IP externe pour le cluster et ainsi d'accéder aux applications dans les pods, sans besoin de connaitre l'IP des nodes
 ```
 kubectl expose deployment nameofmydeployment --port 80 --type LoadBalancer
@@ -248,7 +248,7 @@ Et ça tombe bien, c'est un pod mariadb, donc si on veut on peut se connecter à
 ```
 mysql -u root -p
 ```
-Ah, cela demande un mot de passe... Tranquille, rentrez juste: "pwd".
+Ah, cela demande un mot de passe... Rentrez juste: "pwd".
 Du coup vous pouvez maintenant faire des requêtes SQL. On avait pas dit qu'il fallait mettre en place la base de données? Copiez tout ceci et collez le:
 ```
 CREATE DATABASE data;
@@ -325,7 +325,7 @@ minikube   Ready    control-plane,master   11d   v1.23.3   192.168.49.2   <none>
 ```
 L'ip est 192.168.49.2.
 Donc dans votre navigateur, vous rentrez 192.168.49.2:30037, et cela vous affiche la page d'accueil de Jenkins (après un chargement d'1 ou 2min).
-Et là ça vous demande un mot de passe, pas de panique, il suffit de rentrer dans le conteneur nginx comme indiqué sur la page:
+Et là ça vous demande un mot de passe, pas de panique, il suffit de rentrer dans le conteneur jenkins comme indiqué sur la page:
 ```
 kubectl exec -ti jenkins-cont -- bash
 cat var/jenkins_home/secrets/ini.....
