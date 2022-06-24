@@ -380,8 +380,9 @@ mariadb-anog-service   ClusterIP   10.104.239.146   <none>        3306/TCP
 C'est le 30036.
 
 ### Pour l'ip:
+Ce coup là on change de commande:
 ```
-kubectl get nodes -o wide
+minikube ip
 ```
 ```
 NAME       STATUS   ROLES                  AGE   VERSION   INTERNAL-IP    EXTERNAL-IP   OS-IMAGE             KERNEL-VERSION      CONTAINER-RUNTIME
