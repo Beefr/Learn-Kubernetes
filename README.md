@@ -343,7 +343,7 @@ pipeline {
         stage('Build') {
             steps {
                 // Get some code from a GitHub repository
-                git url: 'https://github.com/Beefr/OnePiece.git', branch: 'dev'
+                git url: 'https://github.com/Beefr/OnePiece.git', branch: 'tutorial'
 
             }
         }
