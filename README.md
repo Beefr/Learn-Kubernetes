@@ -114,8 +114,6 @@ Créons une image de python contenant nginx, flask et du code python pour pouvoi
 (Flask est un micro framework open-source de développement web en Python.)  
 ```
 git clone https://github.com/xXHayabusaXx/miniGame.git
-cd app
-git clone -b tutorial https://github.com/Beefr/OnePiece.git
 ```
 Il va falloir modifier légèrement le Dockerfile, remplace le tout par ceci:
 ```
