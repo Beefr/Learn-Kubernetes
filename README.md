@@ -233,7 +233,7 @@ kubectl cluster-info
 
 ### - Se connecter sur un pod:
 ```
-kubectl exec -ti mariad-anog -- bash
+kubectl exec -ti mariadb-anog -- bash
 ```
 Et ça tombe bien, c'est un pod mariadb, donc si on veut on peut se connecter à mariadb:
 ```
