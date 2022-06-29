@@ -150,6 +150,7 @@ kubectl get svc
 kubectl get pv
 kubectl get pvc
 ```
+Tu as sans doute vu le pod nginx en erreur avec la commande get pods, c'est normal, l'explication est un peu plus bas.  
 
 Dans ce tuto on ne va pas regarder comment faire les fichiers de configuration (les yaml), mais cela peut être intéressant d'aller y jeter un petit coup d'oeil. https://github.com/Beefr/kubernetes-training/blob/master/exercice-3-k8s-manifest.md  
 Déjà vous pouvez voir avec les commandes précédentes qu'il y a un pvc, cela sert d'emplacement de stockage pour les données de l'application, car l'un des conteneurs est un système de gestion de bases de données et donc il faut pouvoir stocker les informations quelque part. D'ailleurs il faudra mettre en place la base de données aussi, on verra cela plus tard, cela permettra de voir une commande interessante de Kubernetes. L'autre pod c'est l'application, elle contient nginx, flask et le code python. Svc c'est pour service, c'est ce qui sert à connecter tous les éléments entre eux.
