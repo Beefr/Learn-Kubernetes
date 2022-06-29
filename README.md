@@ -160,7 +160,7 @@ Déjà vous pouvez voir avec les commandes précédentes qu'il y a un pvc, cela 
 ```
 kubectl logs anog-cont
 ```
-
+Cela vous dit que il ne trouve pas le module menu, normal tu n'as pas mit le python dans le conteneur, tu verras cela avec la partie sur jenkins.
 
 On peut **exposer un déploiement:**
 ```
