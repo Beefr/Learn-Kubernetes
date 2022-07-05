@@ -247,7 +247,7 @@ use data;
 CREATE TABLE joueur(username varchar(20) PRIMARY KEY NOT NULL, password varchar(250));
 CREATE TABLE equipage(username varchar(20) PRIMARY KEY NOT NULL, position varchar(20), piratesid varchar(250));
 CREATE TABLE fruit(name varchar(20)  PRIMARY KEY NOT NULL, power varchar(20), allocated INT);
-CREATE TABLE pirate(id INT PRIMARY KEY NOT NULL, name varchar(40), level INT, fruit varchar(20), qualite INT);
+CREATE TABLE pirate(id INT PRIMARY KEY NOT NULL, name varchar(60), level INT, fruit varchar(20), qualite INT);
 CREATE TABLE world(name varchar(20) PRIMARY KEY NOT NULL, stage INT);
 
 INSERT INTO fruit VALUES('GumGum','[25,25,25,25]', 0);
